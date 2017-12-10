@@ -1,0 +1,1 @@
+The trained model for binary codes can be found at https://drive.google.com/open?id=1S0lkxtH6hL1CaI8SbwScL_L-_qqT0JjF.
