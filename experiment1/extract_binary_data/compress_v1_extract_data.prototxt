@@ -9,11 +9,10 @@ layer {
     mean_value: 127.5
   }
   data_param {
-	source: "g:/compress/image_net_v6_lmdb"
-	#source: "g:/compress/image_test_lmdb"
-    batch_size: 64
-	#batch_size: 1
-    rand_skip: 100
+	source: "g:/compress/image_net_v6_lmdb"# images from image net
+	#source: "g:/compress/image_test_lmdb"#24 images for Kodak
+    batch_size: 64# batch size for extract training data
+	#batch_size: 1# batch size for extract testing data
     backend: LMDB
   }
 }

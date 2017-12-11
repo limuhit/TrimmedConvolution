@@ -12,7 +12,6 @@ layer {
 	#source: "f:/compress/image_net0_lmdb"
 	source: "g:/compress/image_net_v6_lmdb"
     batch_size: 32
-    rand_skip: 95
     backend: LMDB
   }
 }
