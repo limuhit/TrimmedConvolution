@@ -1,0 +1,31 @@
+Add parameters constrain, group_in, group_out for the convolutioanParameter in caffe.proto.
+
+message ConvolutionParameter {
+  optional uint32 num_output = 1; 
+  optional bool bias_term = 2 [default = true];
+  repeated uint32 pad = 3; 
+  repeated uint32 kernel_size = 4; 
+  repeated uint32 stride = 6; 
+  repeated uint32 dilation = 18; 
+  optional uint32 pad_h = 9 [default = 0]; 
+  optional uint32 pad_w = 10 [default = 0]; 
+  optional uint32 kernel_h = 11; 
+  optional uint32 kernel_w = 12; 
+  optional uint32 stride_h = 13; 
+  optional uint32 stride_w = 14;
+  optional uint32 constrain = 19 [default= 0];// 0- not using trimmed convolution; 1- trimmed convoltuion with mask GMA; 2-trimmed convolution with mask GMB
+  optional uint32 group_in = 21 [default = 1];// num of groups in the input feature maps, only used for trimmed convolution.
+  optional uint32 group_out = 22 [default = 1];// num of groups in the output feature maps, only used for trimmed convoltuion.
+  optional uint32 group = 5 [default = 1];
+  optional bool need_backward = 20 [default = true];
+  optional FillerParameter weight_filler = 7; 
+  optional FillerParameter bias_filler = 8; 
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 15 [default = DEFAULT];
+  optional int32 axis = 16 [default = 1];
+  optional bool force_nd_im2col = 17 [default = false];
+}
