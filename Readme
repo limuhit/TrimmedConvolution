@@ -29,3 +29,10 @@ message ConvolutionParameter {
   optional int32 axis = 16 [default = 1];
   optional bool force_nd_im2col = 17 [default = false];
 }
+
+Transpose a integer to a base-[2^mod] code, levels is the length of the code. 
+message MulToBinParameter{
+	optional uint32 levels=1 [default = 1];// The length of the transformed codes.
+	optional uint32 mod=2 [default=1];//The base of transformed code is 2^mod
+	optional bool inverse=3 [default=false];//True: Big-endian order; False: Little-endian order.
+}
