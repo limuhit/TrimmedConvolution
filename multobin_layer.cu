@@ -8,18 +8,30 @@
 namespace caffe {
 	template <typename Dtype>
 	__global__ void multobin_forward_gpu_kernel(const int nthreads, const Dtype * const bottom, Dtype * const top,
-		const int inner_size, const int channel, const int level) {
+		const int inner_size, const int channel, const int level, const int mod, const int nmod,bool inv) {
 		CUDA_KERNEL_LOOP(index, nthreads) {
 			int ts = index % inner_size;
 			int tc = (index / inner_size) % channel;
 			int tn = (index / inner_size / channel);
 			int pbase = tn*channel*level*inner_size + tc*level*inner_size + ts;
 			unsigned int data = static_cast <int>(bottom[index]);
-			for (int j = 0; j < level; j++)
-			{
-				top[pbase] = data % 2;
-				data = data >> 1;
-				pbase += inner_size;
+			if (inv) {
+				pbase = pbase + level*inner_size;
+				for (int j = 0; j < level; j++)
+				{
+					pbase -= inner_size;
+					top[pbase] = data % mod;
+					data = data >> nmod;
+
+				}
+			}
+			else {
+				for (int j = 0; j < level; j++)
+				{
+					top[pbase] = data % mod;
+					data = data >> nmod;
+					pbase += inner_size;
+				}
 			}
 		}
 	}
@@ -29,7 +41,7 @@ namespace caffe {
 		const Dtype* bottom_data = bottom[0]->gpu_data();
 		int num = bottom[0]->count();
 		multobin_forward_gpu_kernel<Dtype> << <CAFFE_GET_BLOCKS(num), CAFFE_CUDA_NUM_THREADS >> >
-			(num, bottom_data,top[0]->mutable_gpu_data(), inner_size_, channel_, levels_);
+			(num, bottom_data,top[0]->mutable_gpu_data(), inner_size_, channel_, levels_,mod_,nmod_,inv_);
 		CUDA_POST_KERNEL_CHECK;
 	}
 

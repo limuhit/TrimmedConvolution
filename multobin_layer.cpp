@@ -14,7 +14,11 @@ namespace caffe {
 		const vector<Blob<Dtype>*>& top) {
 		MulToBinParameter mp = this->layer_param_.multobin_param();
 		levels_ = mp.levels();
-
+		nmod_ = mp.mod();
+		inv_ = mp.inverse();
+		mod_ = 1;
+		for (int i = 0; i < nmod_; i++)
+			mod_ <<= 1;
 	}
 	template <typename Dtype>
 	void MulToBinLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
@@ -28,19 +32,32 @@ namespace caffe {
 	}
 	template <typename Dtype>
 	void multobin_forward_cpu_kernel(const int num, const Dtype * const bottom, Dtype * const top,
-		const int inner_size, const int channel, const int level) {
+		const int inner_size, const int channel, const int level, const int mod, const int nmod,bool inv) {
 		for (int i = 0; i < num; i++) {
 			int ts = i % inner_size;
 			int tc = (i / inner_size) % channel;
 			int tn = (i / inner_size / channel);
 			int pbase = tn*channel*level*inner_size + tc*level*inner_size+ ts;
 			unsigned int data = static_cast <int>(bottom[i]);
-			for (int j = 0; j < level; j++)
-			{
-				top[pbase] = data % 2;
-				data = data >> 1;
-				pbase += inner_size;
+			if (inv) {
+				pbase = pbase + level*inner_size;
+				for (int j = 0; j < level; j++)
+				{
+					pbase -= inner_size;
+					top[pbase] = data % mod;
+					data = data >> nmod;
+					
+				}
 			}
+			else {
+				for (int j = 0; j < level; j++)
+				{
+					top[pbase] = data % mod;
+					data = data >> nmod;
+					pbase += inner_size;
+				}
+			}
+			
 		}
 	}
 	template <typename Dtype>
@@ -48,7 +65,7 @@ namespace caffe {
 		const vector<Blob<Dtype>*>& top) {
 		const Dtype* bottom_data = bottom[0]->cpu_data();
 		
-		multobin_forward_cpu_kernel<Dtype>(bottom[0]->count(), bottom_data, top[0]->mutable_cpu_data(), inner_size_, channel_, levels_);
+		multobin_forward_cpu_kernel<Dtype>(bottom[0]->count(), bottom_data, top[0]->mutable_cpu_data(), inner_size_, channel_, levels_,mod_,nmod_,inv_);
 
 	}
 

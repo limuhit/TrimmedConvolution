@@ -32,6 +32,9 @@ namespace caffe {
 			const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 		int height_, width_, channel_, num_,inner_size_;
 		int levels_;
+		int mod_;
+		int nmod_;
+		int inv_;
 	};
 }
 
